@@ -1,0 +1,50 @@
+steps:
+  # Step 1: Build container
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-repo/hello-cloud-run:$SHORT_SHA',
+        '.'
+      ]
+
+  # Step 2: Push container
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-repo/hello-cloud-run:$SHORT_SHA'
+      ]
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      [
+        'run',
+        'deploy',
+        'hello-cloud-run',
+        '--image',
+        'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-repo/hello-cloud-run:$SHORT_SHA',
+        '--region',
+        'us-central1',
+        '--platform',
+        'managed',
+        '--allow-unauthenticated'
+      ]
+
+  # Step 4: Output message in Cloud Build logs
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        echo "✅ Cloud Run service deployed successfully"
+        echo "🔗 Service URL:"
+        gcloud run services describe hello-cloud-run \
+          --region us-central1 \
+          --format='value(status.url)'
+
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-repo/hello-cloud-run:$SHORT_SHA
