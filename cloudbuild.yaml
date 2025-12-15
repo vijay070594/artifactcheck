@@ -14,7 +14,7 @@ steps:
     args:
       [
         'push',
-        'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-repo/hello-cloud-run:$SHORT_SHA'
+        'us-central1-docker.pkg.dev/$PROJECT_ID/vijay070594/artifactcheck/hello-cloud-run:$SHORT_SHA'
       ]
 
   # Step 3: Deploy to Cloud Run
